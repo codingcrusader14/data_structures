@@ -5,6 +5,7 @@
 #include <limits>
 #include <stdexcept>
 #include <memory>
+#include <algorithm>
 
 template <typename Element, typename Alloc = std::allocator<Element>>
 class Vector : private Alloc {
@@ -199,6 +200,25 @@ public:
     std::swap(data_, other.data_);
     std::swap(capacity_, other.capacity_);
     std::swap(size_, other.size_);
+  }
+
+  /* Non - Member Functions */
+ bool operator==(const Vector<Element, Alloc>& rhs) const {
+    if (size_ != rhs.size_ ) return false;
+    for (size_t i = 0; i < size_; ++i){
+      if (data_[i] != rhs.data_[i]) 
+        return false;
+    }
+    return true;
+  }
+
+  auto operator<=>(const Vector<Element, Alloc>& rhs) const {
+    size_t n = std::min(size_, rhs.size_);
+    for (size_t i = 0; i < n; ++i){
+      auto cmp = data_[i] <=> rhs.data_[i];
+      if (cmp != 0) return cmp;
+    }
+    return size_ <=> rhs.size_;
   }
 
 private:
