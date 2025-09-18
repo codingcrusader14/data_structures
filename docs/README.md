@@ -1,6 +1,6 @@
 # C++ Custom Container Library
 
-This header only library contains all of my custom container implmentations of eventually all the data structures in the C++ STL. All containers try and use modern C++20 feautres such as concepts, spaceship operator and constexpr.
+This header only library contains all of my custom container implmentations of eventually all the data structures in the C++ STL. All containers try and use modern C++20 features such as concepts, spaceship operator and constexpr.
 I also want to include certain competitive programming data structures such as union find and splay trees, this will be a incremental process for me overtime.
 
 ## Purpose
