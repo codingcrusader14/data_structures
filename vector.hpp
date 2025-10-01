@@ -9,7 +9,13 @@
 
 template <typename Element, typename Alloc = std::allocator<Element>>
 class Vector : private Alloc {
-public:
+public: 
+
+  using iterator = Element*;
+  using const_iterator = const Element*;
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
   constexpr Vector() = default;
 
   constexpr Vector(size_t count) : capacity_ {count}, data_ {get_allocator().allocate(count)} {
@@ -108,6 +114,24 @@ public:
   constexpr auto data() -> Element* { return data_; }
   constexpr auto data() const -> const Element* { return data_; }
 
+  /* Iterators */
+  auto begin() -> iterator { return data_; }
+  auto begin() const -> const_iterator { return data_;}
+  auto cbegin() const noexcept -> const_iterator {return data_;}
+
+  auto end() -> iterator { return (data_ + size_);}
+  auto end() const -> const_iterator { return data_ + size_; }
+  auto cend() const noexcept -> const_iterator {return data_ + size_; }
+
+  auto rbegin() -> reverse_iterator { return reverse_iterator(end());}
+  auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(end());}
+  auto crbegin() const noexcept -> const_reverse_iterator { return rbegin();}
+
+  auto rend() -> reverse_iterator { return reverse_iterator(begin());}
+  auto rend() const -> const_reverse_iterator { return const_reverse_iterator(begin());}
+  auto crend() const noexcept -> const_reverse_iterator {return rend();}
+
+
   /* Capacity */
   constexpr auto empty() const -> bool { return size_ == 0;}
 
@@ -203,7 +227,7 @@ public:
   }
 
   /* Non - Member Functions */
- bool operator==(const Vector<Element, Alloc>& rhs) const {
+ bool operator==(const Vector& rhs) const {
     if (size_ != rhs.size_ ) return false;
     for (size_t i = 0; i < size_; ++i){
       if (data_[i] != rhs.data_[i]) 
@@ -212,7 +236,7 @@ public:
     return true;
   }
 
-  auto operator<=>(const Vector<Element, Alloc>& rhs) const {
+  auto operator<=>(const Vector& rhs) const {
     size_t n = std::min(size_, rhs.size_);
     for (size_t i = 0; i < n; ++i){
       auto cmp = data_[i] <=> rhs.data_[i];

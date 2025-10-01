@@ -1,7 +1,12 @@
 #include "array.hpp"
 #include "priority_queue.hpp"
+#include "vector.hpp"
 
-int main () {
-  /* Use your containers! */
+
+using namespace std;
+
+int main() {
+  
   return 0;
 }
+
