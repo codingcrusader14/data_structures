@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+#include <initializer_list>
 
 template <typename Element, typename Alloc = std::allocator<Element>>
 class Vector : private Alloc {
@@ -160,6 +161,100 @@ public:
     }
     size_ = 0;
   }
+
+  auto insert(const_iterator pos, const Element& value) -> iterator{
+    size_t index = pos - begin();
+
+    if (size_ == capacity_){
+      alter_capacity(capacity_ == 0 ? 1 : growth_factor(capacity_));
+    }
+
+    for (size_t i = size_; i > index; --i){
+      data_[i] = std::move(data_[i - 1]);
+    }
+    data_[index] = value;
+    size_++;
+
+    return begin() + index;
+  }
+
+   auto insert(const_iterator pos, const Element&& value) -> iterator{
+    size_t index = pos - begin();
+    
+    if (size_ == capacity_){
+      alter_capacity(capacity_ == 0 ? 1 : growth_factor(capacity_));
+    }
+
+    for (size_t i = size_; i > index; --i){
+      data_[i] = std::move(data_[i - 1]);
+    }
+    data_[index] = value;
+    size_++;
+
+    return begin() + index;
+  }
+
+  auto insert(const_iterator pos, size_t count, const Element& value) -> iterator {
+    size_t index = pos - begin();
+
+    if (size_ == capacity_ || size_ + count > capacity_){
+      alter_capacity(capacity_ == 0 ? 1 : growth_factor(size_ + count));
+    }
+
+    for (size_t i = size_; i-- > index;){
+      data_[i + count] = std::move(data_[i]);
+    }
+
+    for (size_t i = index; i < index + count; ++i){
+      data_[i] = value;
+    }
+
+    size_ += count;
+    return begin() + index;
+  }
+
+  template <typename InputIt, typename = std::enable_if_t<!std::is_integral_v<InputIt>>>
+  auto insert(const_iterator pos, InputIt first, InputIt last) -> iterator {
+    size_t index = pos - begin();
+    size_t length = std::distance(first, last);
+
+    if (size_ == capacity_ || size_ + length > capacity_){
+      alter_capacity(capacity_ == 0 ? 1 : growth_factor(size_ + length));
+    }
+
+    for (size_t i = size_; i-- > index;){
+      data_[i + length] = std::move(data_[i]);
+    }
+
+    for (size_t i = 0; i < length; ++i, ++first){
+      data_[i + index] = *first;
+    }
+
+    size_ += length;
+    return begin() + index;
+  }
+
+  auto insert(const_iterator pos, std::initializer_list<Element> ilist) -> iterator {
+    size_t index = pos - begin();
+    size_t length = ilist.size();
+    if (size_ == capacity_ || size_ + length > capacity_){
+      alter_capacity(capacity_ == 0 ? 1 : growth_factor(size_ + length));
+    }
+
+    for (size_t i = size_; i-- > index;){
+      data_[i + length] = std::move(data_[i]);
+    }
+
+    size_t i = 0;
+    for (const auto& num : ilist) {
+      data_[i + index] = num;
+      ++i;
+    }
+
+    size_ += length;
+    return begin() + index;
+  }
+
 
   constexpr auto push_back(const Element& value) -> void {
     if (size_ == capacity_){
